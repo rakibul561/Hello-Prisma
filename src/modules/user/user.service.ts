@@ -1,8 +1,9 @@
 import { prisma } from "../../config/db"
+import { Prisma, User } from "@prisma/client"
 
  
 
-  const createUserDb = async (payload:any) =>{
+  const createUserDb = async (payload:Prisma.UserCreateInput):Promise<User> =>{
 
     const createUser = await prisma.user.create({
         data:payload
@@ -11,7 +12,68 @@ import { prisma } from "../../config/db"
 
   }
 
+  const getAllFromDb = async () =>{
+
+    const result  = await prisma.user.findMany({
+        select:{
+            id:true,
+            name:true,
+            email:true,
+            phone:true,
+            createdAt:true,
+            picture:true,
+            role:true,
+            status:true,
+            posts:true
+        },
+        orderBy:{
+            createdAt: "desc"
+        }
+    })
+    return result
+  
+ 
+    
+
+  }
+  const getSingleUserById = async (id:number) =>{
+
+    const result  = await prisma.user.findUnique({
+        where: {
+            id
+        },
+        select:{
+            id:true,
+            name:true,
+            email:true,
+            phone:true,
+            createdAt:true,
+            picture:true,
+            role:true,
+            status:true,
+            posts:true
+        },
+    })
+    return result
+
+  }
+
+  const userDelete = async (id:number) =>{
+
+    const result  = await prisma.user.delete({
+        where: {
+            id
+        }
+    })
+    return result
+
+  }
+
+
 
   export const userService = {
-    createUserDb
+    createUserDb,
+    getAllFromDb,
+    getSingleUserById,
+    userDelete
   }

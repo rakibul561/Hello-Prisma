@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
-import { userService } from "./user.service"
+import { userService } from "./user.service";
+
 
  
 
@@ -7,14 +8,53 @@ import { userService } from "./user.service"
      try {
 
         const  users = await userService.createUserDb(req.body)
-        res.send(users);
+        res.status(201).json(users);
         
      } catch (error) {
-        console.log(error)
+       res.status(500).send(error)
+     }
+  }
+  const getAllFromDb = async (req:Request, res:Response) =>{
+     try {
+
+        const  users = await userService.getAllFromDb()
+        res.status(201).json(users);
+        
+     } catch (error) {
+       res.status(500).send(error)
      }
   }
 
+  const getUserById = async (req:Request, res:Response) =>{
+     try {
+        const  users = await userService.getSingleUserById(Number(req.params.id))
+        res.status(201).json(users);
+        
+     } catch (error) {
+       res.status(500).send(error)
+     }
+  }
+
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const user = await userService.userDelete(Number(req.params.id));
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete user",
+      error
+    });
+}}
+
 
   export const userController = {
-    createUser
+    createUser,
+    getAllFromDb,
+    getUserById,
+    deleteUser
   }
