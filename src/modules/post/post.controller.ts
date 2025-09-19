@@ -26,18 +26,20 @@ import { postService } from "./post.service";
   }
 
 
-  const getAllPost = async (req:Request, res:Response) =>{
-     try {
-      
+// controller
+const getAllPost = async (req: Request, res: Response) => {
+  try {
+    const page = Number(req.params.page) || 1
+    const limit = Number(req.params.limit) || 10
+    const search = req.params.search || ""
 
-        const  posts = await postService.getAllPost()
-        res.status(201).json(posts);
-        
-     } catch (error) {
-       res.status(500).send(error)
-     }
+    const posts = await postService.getAllPost({ page, limit, search })
+    res.status(200).json(posts)
+  } catch (error) {
+    console.error(error)
+    res.status(500).send(error)
   }
-  
+}
 
 
 

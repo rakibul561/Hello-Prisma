@@ -1,5 +1,6 @@
 import { prisma } from "../../config/db"
 import { Prisma, User } from "@prisma/client"
+import { userController } from "./user.controller"
 
  
 
@@ -70,10 +71,24 @@ import { Prisma, User } from "@prisma/client"
   }
 
 
+  const updateUser =  async (id:number, payload:Prisma.PostUpdateInput):Promise<User> =>{
+       const result  = await prisma.user.update({
+        where: {
+            id
+        },
+         data :{
+      ...payload
+    }
+    })
+    return result
+  }
+
+
 
   export const userService = {
     createUserDb,
     getAllFromDb,
     getSingleUserById,
-    userDelete
+    userDelete,
+    updateUser
   }

@@ -35,6 +35,22 @@ import { userService } from "./user.service";
      }
   }
 
+  const userUpdate = async(req:Request, res:Response) =>{
+    try {
+      const id = Number(req.params.id)
+      const payload = req.body;
+
+      const updateuser  = await userService.updateUser(id, payload)
+       res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: updateuser
+    });
+    } catch (error) {
+      
+    }
+  }
+
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const user = await userService.userDelete(Number(req.params.id));
@@ -56,5 +72,6 @@ const deleteUser = async (req: Request, res: Response) => {
     createUser,
     getAllFromDb,
     getUserById,
-    deleteUser
+    deleteUser,
+    userUpdate
   }

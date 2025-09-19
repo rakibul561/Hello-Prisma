@@ -1,3 +1,4 @@
+
 import { prisma } from "../../config/db"
 import { Post, Prisma,  } from "@prisma/client"
 
@@ -34,13 +35,50 @@ import { Post, Prisma,  } from "@prisma/client"
 
   }
 
-  const getAllPost = async () =>{
 
-    const result = await prisma.post.findMany()
-    return result
-  }
 
-const updatePost = async (id: number, payload: { title?: string; content?: string }) => {
+// service
+const getAllPost = async ({
+  page,
+  limit,
+  search,
+}: {
+  page: number
+  limit: number
+  search: string
+}) => {
+  const skip = (page - 1) * limit   // ✅ fix here
+
+  const result = await prisma.post.findMany({
+    skip,
+    take: limit,
+    where: search
+      ? {
+          OR: [
+            {
+              title: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              content: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : undefined, // ✅ search না থাকলে সব result আসবে
+  })
+
+  return result
+}
+
+
+
+
+const updatePost = async (id: number, payload:Prisma.PostUpdateInput):Promise<Post> => {
    const result = await prisma.post.update({
     where:{
        id
