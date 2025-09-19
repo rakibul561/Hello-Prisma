@@ -10,7 +10,7 @@ import { userController } from "./user.controller"
  router.get("/:id", userController.getUserById)
  router.post("/", userController.createUser)
 
- export const userRouter = router;
+ export const userRouter = router;  
 
 
 
