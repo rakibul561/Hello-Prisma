@@ -24,57 +24,91 @@ import { Post, Prisma,  } from "@prisma/client"
 
   const getSinglePost = async (id:number) =>{
 
-    const result = await prisma.post.findUnique({
+
+
+    const result = await prisma.$transaction(async (tnx) =>{
+
+       await prisma.post.update({
+      where: {id},
+      data: {
+        views: {
+          increment: 1
+        }
+      }
+     })
+
+    return await prisma.post.findUnique({
       where:{
         id
       },
     
 
     })
+    
+
+    })
+    
+
+    
     return result
 
   }
 
 
 
-// service
-const getAllPost = async ({
-  page,
-  limit,
-  search,
+const getAllPosts = async ({
+    page = 1,
+    limit = 10,
+    search,
+    isFeatured,
+    tags
 }: {
-  page: number
-  limit: number
-  search: string
+    page?: number,
+    limit?: number,
+    search?: string,
+    isFeatured?: boolean,
+    tags?: string[]
 }) => {
-  const skip = (page - 1) * limit   // ✅ fix here
+    const skip = (page - 1) * limit;
 
-  const result = await prisma.post.findMany({
-    skip,
-    take: limit,
-    where: search
-      ? {
-          OR: [
-            {
-              title: {
-                contains: search,
-                mode: "insensitive",
-              },
+    const where: any = {
+        AND: [
+            search && {
+                OR: [
+                    { title: { contains: search, mode: 'insensitive' } },
+                    { content: { contains: search, mode: 'insensitive' } }
+                ]
+
             },
-            {
-              content: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          ],
+            typeof isFeatured === "boolean" && { isFeatured },
+            (tags && tags.length > 0) && { tags: { hasEvery: tags } }
+        ].filter(Boolean)
+    }
+
+    const result = await prisma.post.findMany({
+        skip,
+        take: limit,
+        where,
+        include: {
+            author: true
+        },
+        orderBy: {
+            createdAt: "desc"
         }
-      : undefined, // ✅ search না থাকলে সব result আসবে
-  })
+    });
 
-  return result
-}
+    const total = await prisma.post.count({ where })
 
+    return {
+        data: result,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
+};
 
 
 
@@ -112,7 +146,7 @@ const updatePost = async (id: number, payload:Prisma.PostUpdateInput):Promise<Po
   export const postService = {
     createPostDb,
     getSinglePost,
-    getAllPost,
+    getAllPosts,
     updatePost,
     deletePost
 
