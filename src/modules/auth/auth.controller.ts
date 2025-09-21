@@ -20,17 +20,13 @@ import { AuthService } from "./auth.service"
 
  }
  const loginWithGoogle = async (req:Request, res:Response) =>{
-
      try {
-  
         const result = await AuthService.loginWithGoogle(req.body);
         return res.status(200).json({
             success:true,
             message: "user login succesfull",
             data:result
         })
-
-        
      } catch (error) {
         console.log(error)
      }
@@ -39,7 +35,9 @@ import { AuthService } from "./auth.service"
 
 
 
+
 export const AuthController = {
     loginWithEmailPass,
-    loginWithGoogle
+    loginWithGoogle,
+   
 }

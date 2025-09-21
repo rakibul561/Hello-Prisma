@@ -40,11 +40,14 @@ import { prisma } from "../../config/db"
     }
 
     return user
+ } 
 
- }
+
+ 
 
 
 export const AuthService = {
     loginWithEmailPass,
-    loginWithGoogle
+    loginWithGoogle,
+   
 }

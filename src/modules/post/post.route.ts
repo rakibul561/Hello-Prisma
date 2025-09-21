@@ -12,6 +12,8 @@ import { postController } from "./post.controller";
    router.delete("/:id", postController.deletePost)
   router.patch("/:id", postController.updatePost)
   router.post("/", postController.createPost)
+  router.get("/stats", postController.getBlogStat)
+
 
 
  export const postRouter = router;
