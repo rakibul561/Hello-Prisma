@@ -55,36 +55,59 @@ import { Post, Prisma,  } from "@prisma/client"
   }
 
 
+const getAllPosts = async ({
+    page = 1,
+    limit = 10,
+    search,
+    isFeatured,
+    tags
+}: {
+    page?: number,
+    limit?: number,
+    search?: string,
+    isFeatured?: boolean,
+    tags?: string[]
+}) => {
+    const skip = (page - 1) * limit;
 
-const getAllPosts = async ({page, limit, search} : {page:number, limit:number, search:string}) => {
+    const where: any = {
+        AND: [
+            search && {
+                OR: [
+                    { title: { contains: search, mode: 'insensitive' } },
+                    { content: { contains: search, mode: 'insensitive' } }
+                ]
 
-   const skip = (page - 1) * limit;
+            },
+            typeof isFeatured === "boolean" && { isFeatured },
+            (tags && tags.length > 0) && { tags: { hasEvery: tags } }
+        ].filter(Boolean)
+    }
+
     const result = await prisma.post.findMany({
-      skip,
-      take:limit,
-      where : {
-         OR : [
-           {
-            title: {
-              contains:search,
-              mode:'insensitive'
-            }
-           },
-           {
-            content: {
-              contains:search,
-              mode:'insensitive'
-            }
-           }
-         ]
-      }
+        skip,
+        take: limit,
+        where,
+        include: {
+            author: true
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
     });
-    return result
-  
 
-   
+    const total = await prisma.post.count({ where })
+
+    return {
+        data: result,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
 };
-
 
 
 const updatePost = async (id: number, payload:Prisma.PostUpdateInput):Promise<Post> => {
