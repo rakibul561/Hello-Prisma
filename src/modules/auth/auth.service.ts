@@ -1,14 +1,15 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "../../config/db"
-
- 
+     
+   
+        // custome authentication
  const loginWithEmailPass = async ({email, password} : {email:string, password:string}) =>{
+ 
 
     const user = await prisma.user.findUnique({
        where :{
          email
        },
-       
        
     })
     if(!user){
