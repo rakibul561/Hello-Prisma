@@ -19,6 +19,8 @@ import { AuthService } from "./auth.service"
      }
 
  }
+
+//  google login complate 
  const loginWithGoogle = async (req:Request, res:Response) =>{
      try {
         const result = await AuthService.loginWithGoogle(req.body);
